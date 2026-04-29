@@ -14,28 +14,22 @@ jobs:
 
       - name: Unzip project
         run: |
-          mkdir project
-          unzip MinimalLauncher.zip -d project
-          echo "=== After unzip ==="
-          ls -R project
+          unzip MinimalLauncher.zip
+          echo "=== Files ==="
+          ls -R
 
-      - name: Find gradlew & build
+      - name: Build APK
         run: |
-          cd project
+          GRADLEW=$(find . -type f -name "gradlew" | head -n 1)
 
-          # gradlew file locate karega automatically
-          GRADLEW_PATH=$(find . -type f -name "gradlew" | head -n 1)
+          echo "Gradlew path: $GRADLEW"
 
-          echo "Found gradlew at: $GRADLEW_PATH"
-
-          if [ -z "$GRADLEW_PATH" ]; then
-            echo "❌ gradlew file not found"
+          if [ -z "$GRADLEW" ]; then
+            echo "❌ gradlew not found"
             exit 1
           fi
 
-          # folder jaha gradlew hai waha jao
-          cd $(dirname "$GRADLEW_PATH")
-          
+          cd "$(dirname "$GRADLEW")"
 
           chmod +x gradlew
           ./gradlew assembleDebug
@@ -44,5 +38,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
-          path: |
-            project/**/app/build/outputs/apk/debug/app-debug.apk
+          path: "**/app/build/outputs/apk/debug/app-debug.apk"
